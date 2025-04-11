@@ -19,8 +19,6 @@ def game_starter():
         response = requests.post(endpoint, headers=headers, json=body)
         response.raise_for_status()
         result = response.json()
-        print("Game started successfully!")
-        print(f"Response: {result}")
         return result
 
     except Exception as e:
@@ -29,3 +27,4 @@ def game_starter():
 
 if __name__ == "__main__":
     game_starter()
+

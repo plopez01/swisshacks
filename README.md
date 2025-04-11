@@ -5,6 +5,9 @@
 [API docs](https://hackathon-api.mlo.sehlat.io/docs)  
 [Frontend](https://hackathon-frontend.mlo.sehlat.io/)  
 
+## Ideas
+- Check for consistency betwen documents, but also compare documents with real world data, like city name with country, etc.
+
 ## How to Run the Program
 
 ### Step 1: Create a Python Virtual Environment

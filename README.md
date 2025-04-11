@@ -8,6 +8,14 @@
 ## Ideas
 - Check for consistency betwen documents, but also compare documents with real world data, like city name with country, etc.
 
+## Design considerations
+We need a way to define how generic fields shall be compared toghether for consistency.
+For it to be versatile, a function could be passed when constructing the field that specifies how it's
+consistency score is calculated. This may just be a formula, or a call to a LLM for it to decide.
+
+Scores may be grouped in consistency categories, for which different limits may be configured.
+Like a maximum amount of detected typos, etc.
+
 ## How to Run the Program
 
 ### Step 1: Create a Python Virtual Environment

@@ -4,13 +4,13 @@ class ConsistencyField:
         self._inconsistent_handler = inconsistent_handler
 
     def check(self, val):
-        if self.check_impl(val):
+        if self._check_impl(val):
             return True
         else:
             self._inconsistent_handler(self)
             return False
 
-    def check_impl(self, val):
+    def _check_impl(self, val):
         if self.truth == None:
             self.truth = val
             return True

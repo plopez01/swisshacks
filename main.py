@@ -9,8 +9,8 @@ import api
 
 import time
 
-def inconsistent_handler(field: ConsistencyField, reason: str):
-    print(f"Inconsistent field: {field.name}, reason: {reason}")
+def inconsistent_handler(old_document: str, document: str, htruth: ConsistencyField, new_val: str, reason: str):
+    print(f"Inconsistent field: {htruth.name}, reason: {reason} \"{htruth.truth}\" ({old_document}) differs from \"{new_val}\" ({document})")
 
 cm = InconsistencyCounterModel(inconsistent_handler)
 
@@ -21,8 +21,12 @@ status = "active"
 
 while status != "gameover":
     try:
+        cm.set_document("passport")
         passport_reader.read_passport(cm, gamedata['client_data']['passport'])
+
+        cm.set_document("profile")
         docx_extracter(cm, gamedata['client_data']['profile'])
+
 
         gamedata = api.submit_decision(cm.inconsistencies == 0, session, gamedata['client_id'])
         

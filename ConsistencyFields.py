@@ -1,14 +1,18 @@
 from datetime import *
 
 class ConsistencyField:
-    def __init__(self, name, inconsistent_handler):
+    def __init__(self, name, model):
         self.truth = None
+        self.truth_source = None
+
         self.name = name
-        self._inconsistent_handler = inconsistent_handler
+        self._model = model
 
     def check(self, val):
+        assert self._model._document != None
         if self.truth == None:
             self.truth = val
+            self.truth_source = self._model._document
             return True
 
         if self._check_impl(val):
@@ -18,7 +22,7 @@ class ConsistencyField:
             return False
     
     def fail(self, value, reason: str):
-        self._inconsistent_handler(self, f"{reason} \"{self.truth}\" differs from \"{value}\"")
+        self._model._handler(self.truth_source, self, value, reason)
 
     def _check_impl(self, val):
         return self.truth == val

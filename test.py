@@ -14,7 +14,7 @@ cm.name.check("Pau")
 cm.name.check("Pau")
 cm.name.fail("Wrong")
 
-data = api.game_starter()
+data = api.start_game()
 
 image = io.BytesIO(base64.b64decode(data['client_data']['passport'], validate=True))
 

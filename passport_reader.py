@@ -92,17 +92,4 @@ def read_passport(cm: ConsistencyModel, passport):
     """
     #cm.birth_date.check()
 
-    passport_info['passport'] = ' '.join(text[1].split()[:-2])
-    passport_info['code'] = text[1].split()[-2]
-    passport_info['passport_no'] = text[1].split()[-1]
-    passport_info['surname'] = text[2].split()[0]
-    passport_info['firstname'] = text[2].split()[1:]
-    passport_info['fullname'] = passport_info['firstname'] + passport_info['surname']
-    passport_info['birthdate'] = text[3].split()[0]
-    passport_info['citizenship'] = ' '.join(text[3].split()[1:])
-    passport_info['sex'] = text[4].split()[0][0]  # make sure it is the first letter F or M
-    passport_info['issue_date'] = text[4].split()[1]
-    passport_info['expiry_date'] = text[5].split()[0]
-    passport_info['signature'] = signature
-    print(passport_info)
 

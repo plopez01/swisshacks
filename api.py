@@ -26,6 +26,29 @@ def start_game():
         print(f"Unexpected error: {e}")
         return None
 
+def submit_decision(veredict, session_id, client_id):
+    endpoint = f"{config['api']['host']}/game/decision"
+    headers = {
+        "Content-Type": "application/json",
+        "x-api-key": f"{config['api']['key']}",
+    }
+    body = {
+        "decision": "Accept" if veredict else "Reject",
+        "session_id": session_id,
+        "client_id": client_id
+    }
+
+    try:
+        response = requests.post(endpoint, headers=headers, json=body)
+        response.raise_for_status()
+        result = response.json()
+        return result
+
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return None
+
+
 if __name__ == "__main__":
     print(start_game())
 

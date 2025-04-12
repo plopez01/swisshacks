@@ -2,7 +2,7 @@ from ConsistencyFields import *
 
 class ConsistencyModel:
     def __init__(self, external_handler):
-        self._document = None
+        self.document = None
         self._external_handler = external_handler
 
         # Given name
@@ -60,17 +60,17 @@ class ConsistencyModel:
 
         self.signature = ConsistencyField("signature", self)
 
-    def _handler(self, truth_document: str, field: ConsistencyField, new_val, reason):
-        self._external_handler(truth_document, self._document, field.truth, new_val, reason)
+    def _handler(self, field: ConsistencyField, reason):
+        self._external_handler(field, reason)
         
     def set_document(self, name: str):
-        self._document = name
+        self.document = name
 
 class InconsistencyCounterModel(ConsistencyModel):
     def __init__(self, external_handler):
         super().__init__(external_handler)
         self.inconsistencies = 0
         
-    def _handler(self, truth_source: str, htruth: ConsistencyField, checked_val, reason):
+    def _handler(self, field: ConsistencyField, reason):
         self.inconsistencies += 1
-        self._external_handler(truth_source, self._document, htruth, checked_val, reason)
+        self._external_handler(field, reason)

@@ -1,35 +1,52 @@
 from datetime import *
 
+
+
 class ConsistencyField:
     def __init__(self, name, model):
-        self.truth = None
-        self.truth_source = None
+        self.postulate: str = None
+        self.postulate_source = None
+        
+        self.discrepancy: str = None
+        self.discrepancy_source = None
+        self.discrepancy_level = 0
 
         self.name = name
-        self._model = model
+        self.model = model
 
-    def check(self, val):
-        assert self._model._document != None
-        if self.truth == None:
-            self.truth = val
-            self.truth_source = self._model._document
+    def check(self, val: str):
+        # Document source must be set
+        assert self.model.document != None
+
+        if self.postulate == None:
+            self.postulate = val
+            self.postulate_source = self.model.document
             return True
 
-        if self._check_impl(val):
+        if self._check_impl(self.postulate, val):
             return True
         else:
-            self.fail(val, "Inconsistent fields.")
+            self.discrepancy = val
+            self.discrepancy_source = self.model.document
+
+            if type(self.postulate) == str and self._check_impl(self.postulate.lower(), val.lower()):
+                self.discrepancy_level = 1
+                self.fail("Inconsistent casing.")
+            else:
+                self.discrepancy_level = 2
+                self.fail("Inconsistent fields.")
+
             return False
     
-    def fail(self, value, reason: str):
-        self._model._handler(self.truth_source, self, value, reason)
+    def fail(self, reason):
+        self.model._handler(self, reason)
 
-    def _check_impl(self, val):
-        return self.truth == val
+    def _check_impl(self, postulate, val):
+        return postulate == val
 
 
 # val is (year, month, day) number
 class DateField(ConsistencyField):
-    def check(self, val: datetime):        
-        return self.truth == val
+    def _check_impl(self, postulate, val: datetime):        
+        return postulate == val
         

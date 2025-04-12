@@ -59,8 +59,8 @@ def read_passport(cm: ConsistencyModel, passport):
 
     lines = text_aux.splitlines()
 
-    print(text_aux)
-    print(lines)
+    #print(text_aux)
+    #print(lines)
     non_empty = []
     for line in lines:
         if line.strip():  # skip empty or whitespace-only lines
@@ -83,7 +83,7 @@ def read_passport(cm: ConsistencyModel, passport):
     passport_info['passport_expiry_date'] = text_list[5].split()[0]
     passport_info['signature'] = signature
 
-    print(passport_info)
+    #print(passport_info)
 
     """
     This is overall just not working might need to use llm

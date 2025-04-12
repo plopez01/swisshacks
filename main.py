@@ -9,8 +9,8 @@ import api
 
 import time
 
-def inconsistent_handler(old_document: str, document: str, htruth: ConsistencyField, new_val: str, reason: str):
-    print(f"Inconsistent field: {htruth.name}, reason: {reason} \"{htruth.truth}\" ({old_document}) differs from \"{new_val}\" ({document})")
+def inconsistent_handler(field: ConsistencyField, reason: str):
+    print(f"Inconsistent field: {field.name}, reason: {reason} \"{field.postulate}\" ({field.postulate_source}) differs from \"{field.discrepancy}\" ({field.discrepancy_source})")
 
 cm = InconsistencyCounterModel(inconsistent_handler)
 

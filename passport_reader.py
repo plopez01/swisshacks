@@ -2,6 +2,7 @@ from PIL import Image, ImageOps
 import pytesseract
 import base64
 import io
+import os
 from ConsistencyModel import ConsistencyModel
 import re
 import utils
@@ -9,8 +10,11 @@ from utils import birthdate_to_num
 
 
 def read_passport(cm: ConsistencyModel, passport):
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+    os.environ["TESSDATA_PREFIX"] = r"C:\Users\win10\Desktop\swisshacks\tessdata_best"
+
     # Load image
-    passport = io.BytesIO(base64.b64decode(passport, validate=True))
+    # passport = io.BytesIO(base64.b64decode(passport, validate=True))
     passport = Image.open(passport)
     whitecover = Image.open("whitecover.png")
     whitecover = whitecover.resize((75, 75))

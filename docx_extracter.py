@@ -10,6 +10,12 @@ from plum import add_promotion_rule
 
 from ConsistencyModel import ConsistencyModel
 
+def extract_phone(text_lines):
+    phone_regex = re.compile(r"\+?\d{1,4}[\s\-]?\(?\d{2,4}\)?[\s\-]?\d{2,4}[\s\-]?\d{3,4}")
+    for line in text_lines:
+        if phone_regex.search(line) and "birth" not in line.lower():
+            return phone_regex.search(line).group()
+    return ""
 
 def docx_extracter(cm:ConsistencyModel ,profile_value):
     try:
@@ -132,7 +138,12 @@ def extract_fields(cm:ConsistencyModel, text_lines):
     cm.building_number = address[0][-1]
     cm.street_name = " ".join(address[0][:-1])
     cm.postal_code = address[1][0] + "-" + address[1][1]
-    cm.phone_num = next((line for line in text_lines if re.search(r"\d{2,} \d{3} \d{4}", line)), "")
+
+    #cm.phone_num = next((line for line in text_lines if re.search(r"\d{2,} \d{3} \d{4}", line)), "")
+    #phone_pattern = re.compile(r"\+?\d[\d\s\-()]{7,}")
+    #cm.phone_num = next((line.strip() for line in text_lines if phone_pattern.search(line)), "")
+    cm.phone_num = extract_phone(text_lines)
+
     cm.email = next((line for line in text_lines if "@" in line), "")
     cm.data = extract_maritalState(text_lines)
     cm.education = find_value("Education History", text_lines,1)

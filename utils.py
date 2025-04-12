@@ -40,7 +40,6 @@ def cropImage(image, registrationPoint=(0, 0), threshold=225):
 
     # Crop the original image using this bbox
     cropped = im.crop(bbox)
-    cropped.show()
 
     # Adjust registration point
     left, upper, _, _ = bbox

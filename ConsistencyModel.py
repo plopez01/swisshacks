@@ -72,5 +72,6 @@ class InconsistencyCounterModel(ConsistencyModel):
         self.inconsistencies = 0
         
     def _handler(self, field: ConsistencyField, reason):
-        self.inconsistencies += 1
+        if field.discrepancy_level > 1:
+            self.inconsistencies += 1
         self._external_handler(field, reason)

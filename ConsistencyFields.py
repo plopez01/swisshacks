@@ -1,6 +1,5 @@
 from datetime import *
-
-
+from unidecode import unidecode
 
 class ConsistencyField:
     def __init__(self, name, model):
@@ -29,9 +28,9 @@ class ConsistencyField:
             self.discrepancy = val
             self.discrepancy_source = self.model.document
 
-            if type(self.postulate) == str and self._check_impl(self.postulate.lower(), val.lower()):
+            if type(self.postulate) == str and self._check_impl(unidecode(self.postulate.lower()), unidecode(val.lower())):
                 self.discrepancy_level = 1
-                self.fail("Inconsistent casing.")
+                self.fail("Inconsistent casing/accents.")
             else:
                 self.discrepancy_level = 2
                 self.fail("Inconsistent fields.")

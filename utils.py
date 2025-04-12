@@ -21,7 +21,7 @@ def birthdate_to_num(birthdate: string):
     return year[-2:] + month_map[month_abbr] + day.zfill(2)
 
 
-def birthdate_to_num_list(birthdate: string):
+def date_to_num_list(birthdate: string):
     month_map = {
         'Jan': '01',
         'Feb': '02',
@@ -38,7 +38,7 @@ def birthdate_to_num_list(birthdate: string):
     }
 
     day, month_abbr, year = birthdate.split('-')
-    return day, month_map[month_abbr], year
+    return year, month_map[month_abbr], day
 
 
 def cropImage(image, registrationPoint=(0, 0), threshold=225):

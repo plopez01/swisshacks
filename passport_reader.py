@@ -53,6 +53,8 @@ def read_passport(cm: ConsistencyModel, passport):
 
     bw = high_contrast.point(lambda x: 0 if x < 155 else (160 if x < 200 else 255), '1')
 
+    bw.show()
+
     custom_config = r'--oem 1 --psm 6 -c tessedit_char_blacklist=$@&£'
 
     text_aux = pytesseract.image_to_string(bw, config=custom_config)
@@ -109,11 +111,12 @@ def read_passport(cm: ConsistencyModel, passport):
     cm.passport_num.check(passport_info['passport_num'])
     cm.surname.check(passport_info['surname'])
     cm.name.check(passport_info['firstname'])
-    cm.birth_date.check(utils.birthdate_to_num_list(passport_info['birthdate']))
-    cm.city.check(mappings.nationality_to_country(passport_info["nationality"]))
+    cm.birth_date.check(utils.date_to_num_list(passport_info['birthdate']))
+    cm.country.check(mappings.nationality_to_country(passport_info["nationality"]))
     cm.sex.check(passport_info['sex'])
-    cm.passport_issue_date.check(passport_info['passport_issue_date'])
-    cm.passport_expiry_date.check(passport_info['passport_expiry_date'])
+
+    cm.passport_issue_date.check(utils.date_to_num_list(passport_info['passport_issue_date']))
+    cm.passport_expiry_date.check(utils.date_to_num_list(passport_info['passport_expiry_date']))
 
     
 

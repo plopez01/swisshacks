@@ -20,7 +20,7 @@ def month_name_to_num(month_name: str):
         'nov': '11',
         'dec': '12'
     }
-    return month_map[month_name]
+    return month_map[month_name.lower()]
 
 
 def nationality_to_country(country: str):

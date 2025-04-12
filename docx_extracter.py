@@ -6,11 +6,14 @@ from lxml import etree
 from ConsistencyModel import ConsistencyModel
 
 
-def docx_extracter(cm:ConsistencyModel ,profile_value):
+def docx_extracter(cm:ConsistencyModel, profile_value):
     try:
         docx = base64.b64decode(profile_value, validate=True)
         docx_stream = io.BytesIO(docx)
         text_data = extract_text_from_docx(docx_stream)
+
+        with open('docx.txt', 'w') as f:
+            f.write(str(text_data))
 
         extract_fields(cm, text_data)
 
@@ -111,12 +114,12 @@ def extract_fields(cm:ConsistencyModel, text_lines):
     #cm.surname2.check(find_value("Last Name", text_lines,1))
 
 
-    cm.marital_status.check(extract_gender(text_lines))
+    cm.sex.check(extract_gender(text_lines)[0])
     cm.id_type.check(find_value("ID Type", text_lines,1))
     cm.passport_num.check(find_value("Passport No/ Unique ID", text_lines,1))
-    cm.passport_issue_date.check(find_value("ID Issue Date", text_lines,1))
-    cm.passport_expiry_date.check(find_value("ID Expiry Date", text_lines,1))
-    cm.birth_date.check(find_value("Date of birth ", text_lines,1))
+    cm.passport_issue_date.check(tuple(find_value("ID Issue Date", text_lines,1).split('-')))
+    cm.passport_expiry_date.check(tuple(find_value("ID Expiry Date", text_lines,1).split('-')))
+    cm.birth_date.check(tuple(find_value("Date of birth ", text_lines,1).split('-')))
     cm.country.check(find_value("Country of Domicile", text_lines,1))
 
     address = find_value("Address", text_lines,1)

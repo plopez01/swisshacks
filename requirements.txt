@@ -3,3 +3,4 @@ Pillow
 pytesseract
 PyMuPDF
 PyPDF2
+unidecode

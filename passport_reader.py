@@ -4,6 +4,8 @@ import io
 from PIL import Image, ImageOps
 import pytesseract
 import os
+
+import mappings
 from ConsistencyModel import ConsistencyModel
 import re
 import utils
@@ -54,35 +56,34 @@ def read_passport(cm: ConsistencyModel, passport):
     custom_config = r'--oem 1 --psm 6 -c tessedit_char_blacklist=$@&£'
 
     text_aux = pytesseract.image_to_string(bw, config=custom_config)
+
     lines = text_aux.splitlines()
+
+    print(text_aux)
+    print(lines)
     non_empty = []
-    for line in lines[:11]:
+    for line in lines:
         if line.strip():  # skip empty or whitespace-only lines
             non_empty.append(line)
 
     # Take every other line from non-empty (even indices)
     text_list = non_empty[::2]
-    text_list = text_list + lines[11:]
     passport_info = {}
 
-    print(signature)
     signature, _ = utils.cropImage(signature)
 
-    passport_info['passport'] = ' '.join(text_list[1].split()[:-2])
-    passport_info['code'] = text_list[1].split()[-2]
-    passport_info['passport_no'] = text_list[1].split()[-1]
+    passport_info['passport_code'] = text_list[1].split()[-2]
+    passport_info['passport_num'] = text_list[1].split()[-1]
     passport_info['surname'] = text_list[2].split()[0]
     passport_info['firstname'] = ' '.join(text_list[2].split()[1:])
-    passport_info['fullname'] = passport_info['firstname'] + ' ' + passport_info['surname']
     passport_info['birthdate'] = text_list[3].split()[0]
-    passport_info['citizenship'] = ' '.join(text_list[3].split()[1:])
+    passport_info['nationality'] = ''.join(text_list[3].split()[1].split("/")[0])
     passport_info['sex'] = text_list[4].split()[0][0]  # make sure it is the first letter F or M
-    passport_info['issue_date'] = text_list[4].split()[1]
-    passport_info['expiry_date'] = text_list[5].split()[0]
+    passport_info['passport_issue_date'] = text_list[4].split()[1]
+    passport_info['passport_expiry_date'] = text_list[5].split()[0]
     passport_info['signature'] = signature
 
     print(passport_info)
-
 
     """
     This is overall just not working might need to use llm
@@ -102,9 +103,21 @@ def read_passport(cm: ConsistencyModel, passport):
     if (passport_info['passport_no']+passport_info['code'])+birthdate_to_num(passport_info['birthdate']) == text2_list[0]:
         print("correct2")
     # internal passport bottom info check with rest of info
-
-
     """
-    #cm.birth_date.check()
+
+    cm.passport_code.check(passport_info['passport_code'])
+    cm.passport_num.check(passport_info['passport_num'])
+    cm.surname.check(passport_info['surname'])
+    cm.name.check(passport_info['firstname'])
+    cm.birth_date.check(utils.birthdate_to_num_list(passport_info['birthdate']))
+    cm.city.check(mappings.nationality_to_country(passport_info["nationality"]))
+    cm.sex.check(passport_info['sex'])
+    cm.passport_issue_date.check(passport_info['passport_issue_date'])
+    cm.passport_expiry_date.check(passport_info['passport_expiry_date'])
+
+    
+
+
+
 
 

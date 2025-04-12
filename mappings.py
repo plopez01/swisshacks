@@ -1,3 +1,9 @@
+import json
+
+with open('country_map.json') as f:
+    global country_map
+    country_map = json.load(f)
+
 
 def month_name_to_num(month_name: str):
     month_map = {
@@ -15,3 +21,8 @@ def month_name_to_num(month_name: str):
         'dec': '12'
     }
     return month_map[month_name]
+
+
+def nationality_to_country(country: str):
+    return country_map[country]
+

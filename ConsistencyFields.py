@@ -14,7 +14,7 @@ class ConsistencyField:
         if self._check_impl(val):
             return True
         else:
-            self.fail(self, "Inconsistent fields.")
+            self.fail("Inconsistent fields.")
             return False
     
     def fail(self, reason: str):
@@ -24,6 +24,7 @@ class ConsistencyField:
         return self.truth == val
 
 
+# val is (year, month, day) number
 class DateField(ConsistencyField):
     def check(self, val: datetime):        
         return self.truth == val

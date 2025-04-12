@@ -17,7 +17,8 @@ class ConsistencyModel:
         self.id_type = ConsistencyField("id_type", self._handler)
 
         self.passport_num = ConsistencyField("passport_num", self._handler)
-
+        self.passport_code = ConsistencyField("passport_code", self._handler)
+        
         # Dates are a tuple following (year, month, day)
         self.passport_issue_date = DateField("passport_issue_date", self._handler)
         self.passport_expiry_date = DateField("passport_expiry_date", self._handler)
@@ -27,7 +28,7 @@ class ConsistencyModel:
 
         self.birth_date = DateField("birth_date", self._handler)
 
-        # Country is two lowercase character ISO code, like es
+        # Country is the name, like Portugal, or Spain
         self.country = ConsistencyField("country", self._handler)
         self.city = ConsistencyField("city", self._handler)
 

@@ -2,9 +2,7 @@ from ConsistencyModel import *
 
 import passport_reader
 import pdf_decoder
-
 import api
-
 import time
 
 def inconsistent_handler(field: ConsistencyField, reason: str):
@@ -30,9 +28,9 @@ while status != "gameover":
 
         time.sleep(0.5)
     except Exception as e:
-        print(e)
+        print(e.with_traceback())
         print("ERROR DETECTED, STOPPING")
-        passport_reader.decode_passport(gamedata['client_data']['passport']).save('./log/error_passport.png')
+        passport_reader.decode_passport(gamedata['client_data']['passport']).save('error_passport.png')
         break
 
 

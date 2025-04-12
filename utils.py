@@ -21,6 +21,26 @@ def birthdate_to_num(birthdate: string):
     return year[-2:] + month_map[month_abbr] + day.zfill(2)
 
 
+def birthdate_to_num_list(birthdate: string):
+    month_map = {
+        'Jan': '01',
+        'Feb': '02',
+        'Mar': '03',
+        'Apr': '04',
+        'May': '05',
+        'Jun': '06',
+        'Jul': '07',
+        'Aug': '08',
+        'Sep': '09',
+        'Oct': '10',
+        'Nov': '11',
+        'Dec': '12'
+    }
+
+    day, month_abbr, year = birthdate.split('-')
+    return day, month_map[month_abbr], year
+
+
 def cropImage(image, registrationPoint=(0, 0), threshold=225):
     """
     Crops a grayscale image by removing borders whiter than the given threshold.

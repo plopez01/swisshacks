@@ -4,19 +4,35 @@ import passport_reader
 import pdf_decoder
 
 import api
-import base64
-import io
+
+import time
 
 def inconsistent_handler(field: ConsistencyField, reason: str):
     print(f"Inconsistent field: {field.name}, reason: {reason}")
 
 cm = InconsistencyCounterModel(inconsistent_handler)
 
-game = api.start_game()
+gamedata = api.start_game()
+session = gamedata['session_id']
 
-passport_reader.read_passport(cm, game['client_data']['passport'])
+status = "active"
 
-print(api.submit_decision(cm.inconsistencies == 0, game['session_id'], game['client_id']))
+while status != "gameover":
+    try:
+        passport_reader.read_passport(cm, gamedata['client_data']['passport'])
+
+        gamedata = api.submit_decision(cm.inconsistencies == 0, session, gamedata['client_id'])
+        
+        status = gamedata['status']
+
+        print(f"Status: {status}")
+        print(f"Score: {gamedata['score']}")
+
+        time.sleep(1)
+    except Exception as e:
+        print("ERROR DETECTED, STOPPING")
+        passport_reader.decode_passport(gamedata['client_data']['passport']).save('error_passport.png')
+        break
 
 
 

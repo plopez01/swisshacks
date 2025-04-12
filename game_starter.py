@@ -1,5 +1,6 @@
 
 import base64
+import google.generativeai as genai
 
 
 
@@ -57,7 +58,19 @@ def game_starter():
 
         extract_docx_text_from_base64(description_value)
 
-        return result
+        genai.configure(api_key="AIzaSyAwJD4w41itq27V9FvGHyPrHsr477z4tqI")
+
+        model = genai.GenerativeModel("gemini-1.5-flash-latest")
+
+        response = model.generate_content("Write a haiku about spring")
+
+        print(response.text)
+
+
+
+
+
+
 
 
     except Exception as e:

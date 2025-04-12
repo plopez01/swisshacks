@@ -5,8 +5,7 @@ class ConsistencyModel:
         self._external_handler = external_handler
 
         self.name = ConsistencyField("name", self._handler)
-        self.surname_1 = ConsistencyField("surname_1", self._handler)
-        self.surname_2 = ConsistencyField("surname_2", self._handler)
+        self.surname = ConsistencyField("surname", self._handler)
 
         self.sex = ConsistencyField("sex", self._handler)
 

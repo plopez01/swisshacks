@@ -31,13 +31,13 @@ class ConsistencyModel:
         self.id_type = ConsistencyField(handler)
 
         self.passport_num = ConsistencyField(handler)
-        self.passport_issue_date = ConsistencyField(handler)
-        self.passport_expiry_date = ConsistencyField(handler)
+        self.passport_issue_date = DateField(handler)
+        self.passport_expiry_date = DateField(handler)
 
         # Check if this is actually needed
         self.passport_ocr = ConsistencyField(handler)
 
-        self.birth_date = ConsistencyField(handler)
+        self.birth_date = DateField(handler)
 
         self.country = ConsistencyField(handler)
         self.city = ConsistencyField(handler)

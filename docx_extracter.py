@@ -114,15 +114,7 @@ def extract_fields(text_lines):
     else:
         data["postal code"] = address[1][0] + address[1][1]
 
-
-
-
-
-
-
-
-
-    data["phone_num"] = next((line for line in text_lines if re.search(r"\d{2,} \d{3} \d{4}", line)), "")
+    data["phone_num"] = find_value("Telephone", text_lines, 1)
     data["email"] = next((line for line in text_lines if "@" in line), "")
 
     data["marital_status"] = extract_maritalState(text_lines)

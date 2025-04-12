@@ -98,7 +98,7 @@ def extract_form_values(path):
 
         return form_data
 
-def decode():
+def decode(cm: ConsistencyModel):
     directorio_actual = os.getcwd()
 
     request_result = start_game()
@@ -131,6 +131,19 @@ def decode():
                 form_values["surname_2"] = name_part
             else:
                 break
+    
+    cm.name.check(form_values["client_name"])
+    cm.surname.check(form_values["surname_1"] + " " + form_values["surname_2"])
+    cm.passport_num.check(form_values["passport_number"])
+    cm.building_num.check(form_values["building_number"])
+    cm.street_name.check(form_values["street_name"])
+    cm.postal_code.check(form_values["postal_code"])
+    cm.city.check(form_values["city"])
+    cm.country.check(form_values["country"])
+    cm.phone_num.check(form_values["phone_number"])
+    cm.email.check(form_values["email"])
+
 
 if __name__ == "__main__":
-    decode()
+    cm = ConsistencyModel()
+    decode(cm)

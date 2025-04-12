@@ -18,7 +18,7 @@ def decode_passport(passport):
 def read_passport(cm: ConsistencyModel, passport):
 
     script_dir = os.path.dirname(os.path.abspath(__file__))  # Directory of current script
-    tessdata_path = os.path.join(script_dir, 'tessdata_best')
+    tessdata_path = os.path.join(script_dir, 'tessdata')
 
     # Set the TESSDATA_PREFIX environment variable
     os.environ["TESSDATA_PREFIX"] = tessdata_path

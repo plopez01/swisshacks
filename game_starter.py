@@ -6,6 +6,7 @@ import google.generativeai as genai
 
 URL = "https://hackathon-api.mlo.sehlat.io"  # API endpoint
 
+fields = 'name, surname,marital_status,id_type,passport_num, passport_issue_date, passport_expiry_date,birth_date,country, city,phone_numemail,currency, building_num, st<reet_name, postal_code,education, employment,wealth, bank_account_info,signature'
 
 
 
@@ -13,12 +14,13 @@ def extract_docx_text_from_base64(description_value):
     try:
         # Step 1: Decode the Base64 string
         description_bytes = base64.b64decode(description_value, validate=True)
-
         # Step 2: Write the bytes to a .txt file
         with open("description.txt", "wb") as f:
             f.write(description_bytes)
 
         print("✅ File written successfully to description.txt")
+
+        return description_bytes
 
     except Exception as e:
         print(f"❌ Error: {e}")
@@ -53,19 +55,29 @@ def game_starter():
                 'description': 'U3VtbWFyeSBOb3RlOiAKVGhlIFJNIG1ldCBWaWt0w7NyaWEgS2F0YSBTemVrZXJlcyBkdXJpbmcgYSBidXNpbmVzcyBjb25mZXJlbmNlIGluIEJ1ZGFwZXN0LiBUaGV5IGF0dGVuZGVkIHNldmVyYWwgc2Vzc2lvbnMgdG9nZXRoZXIgYW5kIHJlYWxpemVkIHRoZXkgc2hhcmVkIHNpbWlsYXIgcHJvZmVzc2lvbmFsIGdvYWxzLCBsZWFkaW5nIHRvIGEgZnJ1aXRmdWwgcGFydG5lcnNoaXAuClZpa3TDs3JpYSBLYXRhIFN6ZWtlcmVzIGlzIDM2IHllYXJzIG9sZCBhbmQgY29tZXMgZnJvbSBIdW5nYXJ5LgpMb29raW5nIGZvciBhIHByaXZhdGUgYmFuayB3aXRoIGEgZGVlcCB1bmRlcnN0YW5kaW5nIG9mIHdlYWx0aCBtYW5hZ2VtZW50LCBzaGUgam9pbmVkIEp1bGl1cyBCYWVyIGZvciBpdHMgZXhwZXJ0aXNlLgoKRmFtaWx5IEJhY2tncm91bmQ6IApWaWt0w7NyaWEgS2F0YSBTemVrZXJlcyBpcyBjdXJyZW50bHkgd2lkb3dlZC4gSGVyIGNoaWxkcmVuIGFyZSBuYW1lZCBJc3R2w6FuIGFuZCDDgXJww6FkLgpFZHVjYXRpb24gQmFja2dyb3VuZDogClZpa3TDs3JpYSBjb21wbGV0ZWQgaGVyIHNlY29uZGFyeSBlZHVjYXRpb24gYXQgQnVkYXBlc3RpIFN6ZW50IEzDoXN6bMOzIEdpbW7DoXppdW0gaW4gMjAwNy4KVmlrdMOzcmlhIHB1cnN1ZWQgaGlnaGVyIGVkdWNhdGlvbiBhdCBVbml2ZXJzaXR5IG9mIERlYnJlY2VuLCBncmFkdWF0aW5nIGluIDIwMTIuCgpPY2N1cGF0aW9uIEhpc3Rvcnk6IApXaXRoIGEgY2FyZWVyIHNwYW5uaW5nIG5lYXJseSAxMSB5ZWFycywgVmlrdMOzcmlhIEthdGEgU3pla2VyZXMgaGFzIGVzdGFibGlzaGVkIGhlcnNlbGYgYXMgYSBrZXkgcGxheWVyIGluIHRoZSBpbmR1c3RyeS4KVmlrdMOzcmlhIEthdGEgU3pla2VyZXMgYmVnYW4gaGVyIHByb2Zlc3Npb25hbCBqb3VybmV5IGFzIGEgSm91cm5hbGlzdCBhdCBPcmlnby5odSBpbiAyMDE0LCBsYXlpbmcgdGhlIGZvdW5kYXRpb24gZm9yIGZ1dHVyZSBzdWNjZXNzLgpJbiAyMDE4LCBzaGUgbW92ZWQgdG8gT3JpZ28uaHUgdG8gd29yayBhcyBhIEVkaXRvciwgYXBwbHlpbmcgaGVyIGtub3dsZWRnZSB0byBhY2hpZXZlIG91dHN0YW5kaW5nIHBlcmZvcm1hbmNlLgpTaGUgZWFybmVkIDEyOTYyMDAwIEhVRiBwLkEuIGF0IGhlciBsYXN0IHBvc2l0aW9uLgpXZWFsdGggU3VtbWFyeTogClNoZSBtYW5hZ2VkIHRvIHNhdmUgYXBwcm94aW1hdGVseSAxNjAwMDAwMCBIVUYgZnJvbSBoZXIgZWFybmluZ3MgYXQgYWxsIGNvbXBhbmllcy4KSGVyIHJlbWFya2FibGUgcG9ydGZvbGlvIGNvbXByaXNlcyAyIHN0dW5uaW5nIHByb3BlcnRpZXMuIFNpdHVhdGVkIGluIHByaW1lIGxvY2F0aW9ucyBhY3Jvc3MgU29wcm9uIGFuZCBCw6lrw6lzY3NhYmEsIHRoZXNlIGFzc2V0cyBkZW1vbnN0cmF0ZSB0aGVpciBzb3BoaXN0aWNhdGVkIHVuZGVyc3RhbmRpbmcgb2YgcmVhbCBlc3RhdGUgaW52ZXN0bWVudHMgYW5kIGhpZ2gtZW5kIGxpZmVzdHlsZSBwcmVmZXJlbmNlcy4KU2hlIGluaGVyaXRlZCAyNDUwMDAwIEVVUiBmcm9tIGhlciBncmFuZG1vdGhlciwgYSB3ZWxsLWtub3duIE9pbCBhbmQgR2FzIEV4ZWN1dGl2ZSwgaW4gMjAxOCwgYWxsb3dpbmcgaGVyIHRvIGV4cGFuZCBoZXIgaW52ZXN0bWVudCBwb3J0Zm9saW8uCgpDbGllbnQgU3VtbWFyeTogCkdpdmVuIHRoZSBjbGllbnQncyBpbXByZXNzaXZlIGNhcmVlciBoaXN0b3J5IGFuZCBmaW5hbmNpYWwgZGlzY2lwbGluZSwgd2UgYXJlIGNvbmZpZGVudCBpbiBoZXIgYWJpbGl0eSB0byBhY2hpZXZlIGZpbmFuY2lhbCBzdWNjZXNzIGFuZCBzZWN1cml0eS4K'
             }
         }
-        print("Game started successfully!")
+        # Extract the description (Base64 string) and decode it.
         description_value = result['client_data']['description']
+        description_bytes = extract_docx_text_from_base64(description_value)
 
-        extract_docx_text_from_base64(description_value)
+        # Decode the bytes to a string.
+        # Use error handling in case the byte sequence is not valid UTF-8.
+        description_text = description_bytes.decode("utf-8", errors="replace") if description_bytes else ""
 
+        # Build a single prompt string that contains both instructions and the fields to be filled.
+
+        content = "I want you to extract info. In fact, I want you to fill in the next fields: " + fields + "Fill these fields by interpreting the following info: " + description_text
+        print(content)
+        prompt = (
+                content
+        )
+
+        # Configure the generative model API key.
         genai.configure(api_key="AIzaSyAwJD4w41itq27V9FvGHyPrHsr477z4tqI")
-
         model = genai.GenerativeModel("gemini-1.5-flash-latest")
 
-        response = model.generate_content("Write a haiku about spring")
-
+        # Call the model with the properly constructed single prompt string.
+        response = model.generate_content(prompt)
         print(response.text)
-
 
 
 

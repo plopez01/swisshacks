@@ -4,15 +4,21 @@ class ConsistencyModel:
     def __init__(self, external_handler):
         self._external_handler = external_handler
 
+        # Given name
         self.name = ConsistencyField("name", self._handler)
+
+        # Surname/s
         self.surname = ConsistencyField("surname", self._handler)
 
+        # M for male, F for female
         self.sex = ConsistencyField("sex", self._handler)
 
-        # This needed?
+        # This needed?, passport
         self.id_type = ConsistencyField("id_type", self._handler)
 
         self.passport_num = ConsistencyField("passport_num", self._handler)
+
+        # Dates are a tuple following (year, month, day)
         self.passport_issue_date = DateField("passport_issue_date", self._handler)
         self.passport_expiry_date = DateField("passport_expiry_date", self._handler)
 
@@ -21,12 +27,14 @@ class ConsistencyModel:
 
         self.birth_date = DateField("birth_date", self._handler)
 
+        # Country is two lowercase character ISO code, like es
         self.country = ConsistencyField("country", self._handler)
         self.city = ConsistencyField("city", self._handler)
 
         self.phone_num = ConsistencyField("phone_num", self._handler)
         self.email = ConsistencyField("email", self._handler)
 
+        # thre letter currency name, eur for example
         self.currency = ConsistencyField("currency", self._handler)
         self.building_num = ConsistencyField("building_num", self._handler)
         self.street_name = ConsistencyField("street_name", self._handler)

@@ -15,7 +15,7 @@ def read_passport(cm: ConsistencyModel, passport):
 
     signature = gray.crop(bbox)
     position = (300, 100)  # (x, y) coordinates
-    signature.show()
+
     # Paste overlay image onto the base image with transparency
     gray.paste(whitecover, position, whitecover)
 
@@ -36,31 +36,43 @@ def read_passport(cm: ConsistencyModel, passport):
     bw.show()
 
     # OCR
-    custom_config = r'--oem 1 --psm 6 -c tessedit_char_blacklist=$@&'
+    custom_config = r'--oem 1 --psm 6 -c tessedit_char_blacklist=$@&£'
 
-    text = pytesseract.image_to_string(bw, config=custom_config)
+    text_aux = pytesseract.image_to_string(bw, config=custom_config)
+    print(text_aux)
+    lines = text_aux.splitlines()
+    non_empty = []
+    for line in lines[:11]:
+        if line.strip():  # skip empty or whitespace-only lines
+            non_empty.append(line)
+        else:
+            print("hole                          l")
 
-    lines = text.splitlines()
+    # Take every other line from non-empty (even indices)
+    text_list = non_empty[::2]
 
-    # Modify only the first 9 lines
-    text = [line for i, line in enumerate(lines[:11]) if i % 2 == 0]
-    text = text + lines[11:]
+    text_list = text_list + lines[11:]
 
-    print(text)
+
+
     passport_info = {}
 
-    #cm.birth_date.check()
 
-    passport_info['passport'] = ' '.join(text[1].split()[:-2])
-    passport_info['code'] = text[1].split()[-2]
-    passport_info['passport_no'] = text[1].split()[-1]
-    passport_info['surname'] = text[2].split()[0]
-    passport_info['firstname'] = ' '.join(text[2].split()[1:])
+    passport_info['passport'] = ' '.join(text_list[1].split()[:-2])
+    passport_info['code'] = text_list[1].split()[-2]
+    passport_info['passport_no'] = text_list[1].split()[-1]
+    passport_info['surname'] = text_list[2].split()[0]
+    passport_info['firstname'] = ' '.join(text_list[2].split()[1:])
     passport_info['fullname'] = passport_info['firstname'] + ' ' + passport_info['surname']
-    passport_info['birthdate'] = text[3].split()[0]
-    passport_info['citizenship'] = ' '.join(text[3].split()[1:])
-    passport_info['sex'] = text[4].split()[0][0]  # make sure it is the first letter F or M
-    passport_info['issue_date'] = text[4].split()[1]
-    passport_info['expiry_date'] = text[5].split()[0]
+    passport_info['birthdate'] = text_list[3].split()[0]
+    passport_info['citizenship'] = ' '.join(text_list[3].split()[1:])
+    passport_info['sex'] = text_list[4].split()[0][0]  # make sure it is the first letter F or M
+    passport_info['issue_date'] = text_list[4].split()[1]
+    passport_info['expiry_date'] = text_list[5].split()[0]
     passport_info['signature'] = signature
+
+
+
+
+    #cm.birth_date.check()
     print(passport_info)

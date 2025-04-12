@@ -1,11 +1,6 @@
-import requests
-import os
-import re
-import io
-from pathlib import Path
-import base64, binascii
-import zipfile
-from lxml import etree as ET
+
+import base64
+
 
 
 URL = "https://hackathon-api.mlo.sehlat.io"  # API endpoint

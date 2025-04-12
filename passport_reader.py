@@ -11,7 +11,6 @@ def read_passport(cm: ConsistencyModel, passport):
     passport = Image.open(passport)
     whitecover = Image.open("whitecover.png")
     whitecover = whitecover.resize((75, 75))
-
     # Convert to grayscale
     gray = ImageOps.grayscale(passport)
     bbox = (265, 210, 350, 250)  # Define the area to extract (left, top, right, bottom)
@@ -36,8 +35,6 @@ def read_passport(cm: ConsistencyModel, passport):
 
     bw = high_contrast.point(lambda x: 0 if x < 155 else (160 if x < 200 else 255), '1')
 
-    bw.show()
-
     custom_config = r'--oem 1 --psm 6 -c tessedit_char_blacklist=$@&£'
 
     text_aux = pytesseract.image_to_string(bw, config=custom_config)
@@ -53,6 +50,8 @@ def read_passport(cm: ConsistencyModel, passport):
     text_list = text_list + lines[11:]
     passport_info = {}
 
+    print(signature)
+    signature, _ = utils.cropImage(signature)
 
     passport_info['passport'] = ' '.join(text_list[1].split()[:-2])
     passport_info['code'] = text_list[1].split()[-2]

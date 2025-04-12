@@ -26,14 +26,14 @@ def start_game():
         print(f"Unexpected error: {e}")
         return None
 
-def submit_decision(veredict, session_id, client_id):
+def submit_decision(valid: bool, session_id, client_id):
     endpoint = f"{config['api']['host']}/game/decision"
     headers = {
         "Content-Type": "application/json",
         "x-api-key": f"{config['api']['key']}",
     }
     body = {
-        "decision": "Accept" if veredict else "Reject",
+        "decision": "Accept" if valid else "Reject",
         "session_id": session_id,
         "client_id": client_id
     }

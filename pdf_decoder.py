@@ -1,29 +1,13 @@
 import os
 import base64
 import fitz  # Asegúrate de tener instalada la biblioteca PyMuPDF
-import json
-from api import game_starter
-
-# Obtiene la ruta del directorio actual
-directorio_actual = os.getcwd()
-
-# 1. Obtener base64 del PDF
-request_result = game_starter()
-if request_result is None:
-    print("Error al obtener el resultado de la solicitud")
-    exit()
-
-base64_pdf = request_result["client_data"]["account"]
-
-# 2. Guardar como archivo PDF
-pdf_filename = os.path.join(directorio_actual, "client_account.pdf")
-with open(pdf_filename, "wb") as f:
-    f.write(base64.b64decode(base64_pdf))
-
-# 3. Usar PyPDF2 para leer el PDF
-import json
+from api import start_game
 from PyPDF2 import PdfReader
+from ConsistencyModel import ConsistencyModel
+import fitz  # PyMuPDF para capturar la región de la imagen
 
+# Dictionary of known fields in the PDF form
+# Separated into text fields and checkbox fields for currency selection
 KNOWN_FIELDS = {
     "text_fields": [
         "account_name",
@@ -47,6 +31,42 @@ KNOWN_FIELDS = {
     ]
 }
 
+def extract_signature(path):
+    with open(path, 'rb') as file:
+        reader = PdfReader(file)
+        fields = reader.get_fields()
+        
+        page = reader.pages[0]
+        signature_base64 = None
+
+        if '/Resources' in page and '/XObject' in page['/Resources']:
+            xobjects = page['/Resources']['/XObject']
+            if '/fzImg0' in xobjects:
+                signature_obj = xobjects['/fzImg0'].get_object()
+                
+                # Calcular centro y dimensiones
+                center_x = float(page.mediabox.width) * 0.2639
+                center_y = float(page.mediabox.height) * 0.716
+                width = float(page.mediabox.width) * 0.254
+                height = float(page.mediabox.height) * 0.047
+        
+                # Calcular coordenadas del rectángulo a partir del centro y dimensiones
+                x0 = center_x - width/2
+                y0 = center_y - height/2
+                x1 = center_x + width/2
+                y1 = center_y + height/2
+                
+                # Capturar la región de la firma en el PDF
+                doc = fitz.open(path)
+                page_pdf = doc[0]
+                rect = fitz.Rect(x0, y0, x1, y1)
+                pix = page_pdf.get_pixmap(clip=rect)
+                pix.save("signature_region.png")
+                doc.close()
+                return "signature_region.png"
+        else:
+            return None
+
 def extract_form_values(path):
     with open(path, 'rb') as file:
         reader = PdfReader(file)
@@ -57,62 +77,60 @@ def extract_form_values(path):
 
         form_data = {}
 
-        # Campos de texto
         for field_name in KNOWN_FIELDS["text_fields"]:
-            value = fields.get(field_name, {}).get('/V', None)  # Get value or None if not found
+            value = fields.get(field_name, {}).get('/V', None)
             form_data[field_name] = value
 
-        # Checkboxes (Moneda)
         selected_currency = None
         for field_name in KNOWN_FIELDS["checkbox_fields"]:
-            value = fields.get(field_name, {}).get('/V', None)  # Get value or None if not found
-            if value == '/Yes':  # Solo el campo con '/Yes' será seleccionado
+            value = fields.get(field_name, {}).get('/V', None)
+            if value == '/Yes':
                 selected_currency = field_name
-                break  # Salimos del ciclo al encontrar el valor True
+                break
 
-        # Si no hay una moneda seleccionada, comprobamos 'other_ccy'
         if not selected_currency:
-            other_ccy_value = form_data.get("other_ccy", "").strip()  # El valor de 'other_ccy'
-            if other_ccy_value:  # Si tiene algún valor
+            other_ccy_value = form_data.get("other_ccy", "").strip()
+            if other_ccy_value:
                 selected_currency = "other_ccy"
 
-        # Agregar la moneda seleccionada (si hay)
         form_data["currency"] = selected_currency if selected_currency else None
+        form_data["signature"] = extract_signature(path)
 
-        """
-        # Extraer la firma como imagen y guardar en el directorio
-        signature_image = extract_signature_as_image(path)
-        if signature_image:
-            form_data["signature"] = signature_image  # Guardamos la ruta de la imagen
-        """
-        
         return form_data
 
-# Uso
-form_values = extract_form_values(pdf_filename)
+def decode():
+    directorio_actual = os.getcwd()
 
-# Mostrar resultado en consola
-for field, value in form_values.items():
-    print(f"Field Name: {field}, Value: {value}")
+    request_result = start_game()
+    if request_result is None:
+        print("Error al obtener el resultado de la solicitud")
+        exit()
 
-# Convertir a JSON
-pdf_content_json = json.dumps(form_values, indent=4)
+    base64_pdf = request_result["client_data"]["account"]
 
-"""
-# 4. Comparar con los campos de client_data
-client_data = game_starter["result"]["client_data"]
-missing_fields = {}
+    pdf_filename = os.path.join(directorio_actual, "client_account.pdf")
+    with open(pdf_filename, "wb") as f:
+        f.write(base64.b64decode(base64_pdf))
 
-for key, value in client_data.items():
-    # Evitar comparar el PDF en sí
-    if key == "description":
-        continue
-    if isinstance(value, str) and value not in pdf_text:
-        missing_fields[key] = value
+    form_values = extract_form_values(pdf_filename)
 
-# 5. Mostrar resultados
-print("\nTexto extraído del PDF:\n")
-print(pdf_text)
-print("\nCampos del JSON que no están en el PDF:\n")
-print(missing_fields)
-"""
+    if form_values.get("account_name"):
+        full_name = form_values["account_name"].strip()
+        name_parts = full_name.split()
+        
+        form_values["client_name"] = None
+        form_values["surname_1"] = None
+        form_values["surname_2"] = None
+
+        for (i, name_part) in enumerate(name_parts):
+            if i == 0:
+                form_values["client_name"] = name_part
+            elif i == 1:
+                form_values["surname_1"] = name_part
+            elif i == 2:
+                form_values["surname_2"] = name_part
+            else:
+                break
+
+if __name__ == "__main__":
+    decode()

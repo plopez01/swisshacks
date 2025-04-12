@@ -1,5 +1,7 @@
 from PIL import Image, ImageOps
 import pytesseract
+import base64
+import io
 from ConsistencyModel import ConsistencyModel
 import re
 import utils
@@ -8,6 +10,7 @@ from utils import birthdate_to_num
 
 def read_passport(cm: ConsistencyModel, passport):
     # Load image
+    passport = io.BytesIO(base64.b64decode(passport, validate=True))
     passport = Image.open(passport)
     whitecover = Image.open("whitecover.png")
     whitecover = whitecover.resize((75, 75))

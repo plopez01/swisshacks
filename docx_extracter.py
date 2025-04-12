@@ -1,12 +1,7 @@
-import requests
-import os
-import re
 import io
-from pathlib import Path
 import base64, binascii
 import zipfile
 from lxml import etree
-from plum import add_promotion_rule
 
 from ConsistencyModel import ConsistencyModel
 
@@ -19,27 +14,27 @@ def docx_extracter(cm:ConsistencyModel ,profile_value):
 
         extract_fields(cm, text_data)
 
-        print("DOCDSFDSAFADSF")
+        #print("DOCDSFDSAFADSF")
 
         fields = [
-            'name', 'surname1', 'surname2',
-            'sex', 'id_type',
+            'name', 'surname',
+            'marital_status',
+            'id_type',
             'passport_num', 'passport_issue_date', 'passport_expiry_date',
             'passport_ocr', 'birth_date',
             'country', 'city',
             'phone_num', 'email',
             'currency', 'building_num', 'street_name', 'postal_code',
-            'marital_status',
             'education', 'employment',
             'wealth', 'bank_account_info',
             'signature'
         ]
 
-        for field_name in fields:
-            field = getattr(cm, field_name)
-            print(f"{field_name}: {field.value if hasattr(field, 'value') else field}")
+        #for field_name in fields:
+            #field = getattr(cm, field_name)
+            #print(f"{field_name}: {field.value if hasattr(field, 'value') else field}")
 
-        print("DOCDSFDSAFADSF")
+        #print("DOCDSFDSAFADSF")
 
 
 
@@ -108,37 +103,40 @@ def extract_fields(cm:ConsistencyModel, text_lines):
 
     # Line-by-line lookup
     full_name = find_value("First/ Middle Name (s)", text_lines,1)
-    name_parts = full_name.split()
+    cm.name.check(full_name)
+    cm.surname.check(find_value("Last Name", text_lines,1))
 
-    cm.name = name_parts[0]
-    cm.surname1 = name_parts[1]
-    cm.surname2 = find_value("Last Name", text_lines,1)
-    cm.sex = extract_gender(text_lines)
-    cm.id_type = find_value("ID Type", text_lines,1)
-    cm.passport_num = find_value("Passport No/ Unique ID", text_lines,1)
-    cm.passport_issue_date = find_value("ID Issue Date", text_lines,1)
-    cm.passport_expiry_date = find_value("ID Expiry Date", text_lines,1)
-    cm.birth_date = find_value("Date of birth ", text_lines,1)
-    cm.country = find_value("Country of Domicile", text_lines,1)
+    #cm.name.check(name_parts[0])
+    #cm.surname1.check(name_parts[1])
+    #cm.surname2.check(find_value("Last Name", text_lines,1))
+
+
+    cm.marital_status.check(extract_gender(text_lines))
+    cm.id_type.check(find_value("ID Type", text_lines,1))
+    cm.passport_num.check(find_value("Passport No/ Unique ID", text_lines,1))
+    cm.passport_issue_date.check(find_value("ID Issue Date", text_lines,1))
+    cm.passport_expiry_date.check(find_value("ID Expiry Date", text_lines,1))
+    cm.birth_date.check(find_value("Date of birth ", text_lines,1))
+    cm.country.check(find_value("Country of Domicile", text_lines,1))
 
     address = find_value("Address", text_lines,1)
-    cm.address = address
+    #cm.address.check(address)
     address = address.split(",")
 
     address[1] = address[1].split()
     address[0] = address[0].split()
 
-    cm.city = address[1][-1]
-    cm.building_num = address[0][-1]
-    cm.street_name = " ".join(address[0][:-1])
-    cm.postal_code = address[1][0] + "-" + address[1][1]
+    cm.city.check(address[1][-1])
+    cm.building_num.check(address[0][-1])
+    cm.street_name.check(" ".join(address[0][:-1]))
+    cm.postal_code.check(address[1][0] + "-" + address[1][1])
 
 
-    cm.phone_num = find_value("Telephone", text_lines,1)
-    cm.email = next((line for line in text_lines if "@" in line), "")
-    cm.data = extract_maritalState(text_lines)
-    cm.education = find_value("Education History", text_lines,1)
-    cm.employment = extract_employment("Current employment and function",text_lines)
+    cm.phone_num.check(find_value("Telephone", text_lines,1))
+    cm.email.check(next((line for line in text_lines if "@" in line), ""))
+    cm.marital_status.check(extract_maritalState(text_lines))
+    cm.education.check(find_value("Education History", text_lines,1))
+    cm.employment.check(extract_employment("Current employment and function",text_lines))
 
 
 

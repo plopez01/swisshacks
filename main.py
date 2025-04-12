@@ -32,7 +32,7 @@ while status != "gameover":
     except Exception as e:
         print(e)
         print("ERROR DETECTED, STOPPING")
-        passport_reader.decode_passport(gamedata['client_data']['passport']).save('error_passport.png')
+        passport_reader.decode_passport(gamedata['client_data']['passport']).save('./log/error_passport.png')
         break
 
 

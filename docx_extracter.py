@@ -15,6 +15,9 @@ def docx_extracter(profile_value):
         docx_stream = io.BytesIO(docx)
         text_data = extract_text_from_docx(docx_stream)
 
+        with open("profile.docx", "wb") as f:
+            f.write(docx)
+
         data = {}
         data = extract_fields(text_data)
         print(data)
@@ -78,12 +81,9 @@ def extract_fields(text_lines):
     data = {}
     joined = "\n".join(text_lines)
 
-    # Line-by-line lookup
-    full_name = find_value("First/ Middle Name (s)", text_lines,1)
-    name_parts = full_name.split()
-    data["name"] = name_parts[0]
-    data["surname1"] = name_parts[1]
-    data["surname2"] = find_value("Last Name", text_lines,1)
+
+    data["name"] = find_value("First/ Middle Name (s)", text_lines,1)
+    data["surname"] = find_value("Last Name", text_lines,1)
 
     data["sex"] = extract_gender(text_lines)
     data["id_type"] = find_value("ID Type", text_lines,1)
@@ -99,7 +99,6 @@ def extract_fields(text_lines):
     data["country"] = find_value("Country of Domicile", text_lines,1)
 
     address = find_value("Address", text_lines,1)
-    data["address"] = address
 
     address = address.split(",")
 
@@ -108,7 +107,12 @@ def extract_fields(text_lines):
     data["city"] = address[1][-1]
     data["building number"] = address[0][-1]
     data["street name"] = " ".join(address[0][:-1])
-    data["postal code"] = address[1][0] + "-" + address[1][1]
+
+
+    if len(address[1][0]) == 5:
+        data["postal code"] = address[1][0]
+    else:
+        data["postal code"] = address[1][0] + address[1][1]
 
 
 

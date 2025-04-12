@@ -2,7 +2,7 @@ import os
 import base64
 import fitz  # Asegúrate de tener instalada la biblioteca PyMuPDF
 import json
-from game_starter import game_starter
+from api import game_starter
 
 # Obtiene la ruta del directorio actual
 directorio_actual = os.getcwd()

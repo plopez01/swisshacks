@@ -1,12 +1,16 @@
 
 import base64
 import google.generativeai as genai
+from django.utils.html import MAX_URL_LENGTH
+
+fields_v2 = 'name: Viktória Kata, surname: Szekeres, sex: Female, marital_status: Widowed, birth_date: 1989-01-11, country: Hungary,currency: EUR,education: University of Debrec en (2012),employment:  Employee Since 2018 Name Employer Origo.hu Position Editor (12962000 HUF p.A.), wealth: 1.5m-5m'
 
 
+#sex = Female, Male
+#Marital Status = Divorced, Married, Single, Widowed
 
 URL = "https://hackathon-api.mlo.sehlat.io"  # API endpoint
 
-fields = 'name, surname,marital_status,id_type,passport_num, passport_issue_date, passport_expiry_date,birth_date,country, city,phone_numemail,currency, building_num, st<reet_name, postal_code,education, employment,wealth, bank_account_info,signature'
 
 
 
@@ -15,10 +19,6 @@ def extract_docx_text_from_base64(description_value):
         # Step 1: Decode the Base64 string
         description_bytes = base64.b64decode(description_value, validate=True)
         # Step 2: Write the bytes to a .txt file
-        with open("description.txt", "wb") as f:
-            f.write(description_bytes)
-
-        print("✅ File written successfully to description.txt")
 
         return description_bytes
 
@@ -65,8 +65,35 @@ def game_starter():
 
         # Build a single prompt string that contains both instructions and the fields to be filled.
 
-        content = "I want you to extract info. In fact, I want you to fill in the next fields: " + fields + "Fill these fields by interpreting the following info: " + description_text
-        print(content)
+        content = (
+            "You will receive two inputs:\n\n"
+            "1. A list of correct data in the format (field = value).\n"
+            "2. A block of unstructured text that contains information to be analyzed.\n\n"
+            "Your task is to:\n"
+            "- Analyze the text and compare it against the reference information.\n"
+            "- Identify any **inconsistencies**, meaning contradictions, illogical statements, or conflicting data.\n\n"
+            "Important notes:\n"
+            "- The `employment` field refers **only to the subject’s most recent or current job**, "
+            "including position title, employer name, and starting year.\n"
+            "- You must **ignore all previous or past jobs** when evaluating the `employment` field. "
+            "Only compare the last job mentioned in the text against the reference information.\n"
+            "- Field constraints:\n"
+            "   - `sex` must be one of: Female, Male\n"
+            "   - `marital_status` must be one of: Single, Married, Divorced, Widowed\n\n"
+            "For each field where the information in the text is inconsistent with the reference data, "
+            "return a JSON object with:\n"
+            "- `field`: the name of the field\n"
+            "- `reason`: a brief but clear explanation of the inconsistency (1–2 sentences max)\n\n"
+            "Return a **list of JSON objects**, one per inconsistency.\n"
+            "Do not include any explanations outside of the JSON list.\n\n"
+            "Reference Information (correct values):\n"
+            f"{fields_v2}\n\n"
+            "Text to Analyze:\n"
+            f"{description_text}"
+        )
+
+        #print(content)
+
         prompt = (
                 content
         )

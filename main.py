@@ -28,7 +28,7 @@ while status != "gameover":
         print(f"Status: {status}")
         print(f"Score: {gamedata['score']}")
 
-        time.sleep(1)
+        time.sleep(0.5)
     except Exception as e:
         print(e)
         print("ERROR DETECTED, STOPPING")

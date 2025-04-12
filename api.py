@@ -22,8 +22,9 @@ def start_game():
         result = response.json()
         return result
 
-    except Exception as e:
+    except requests.HTTPError as e:
         print(f"Unexpected error: {e}")
+
         return None
 
 def submit_decision(valid: bool, session_id, client_id):
@@ -44,7 +45,7 @@ def submit_decision(valid: bool, session_id, client_id):
         result = response.json()
         return result
 
-    except Exception as e:
+    except requests.HTTPError as e:
         print(f"Unexpected error: {e}")
         return None
 

@@ -47,11 +47,23 @@ def find_value(label, lines, offset=1):
 def extract_gender(text_lines):
     for line in text_lines:
         line_lower = line.lower()
-        if "female" in line_lower and "male" in line_lower:
-            if "☒ female" in line_lower:
-                return "Female"
-            elif "☒ male" in line_lower:
-                return "Male"
+        if "☒ female" in line_lower:
+            return "Female"
+        elif "☒ male" in line_lower:
+            return "Male"
+    return None
+
+def extract_maritalState(text_lines):
+    for line in text_lines:
+        line_lower = line.lower()
+        if "☒ divorced" in line_lower:
+            return "Divorced"
+        elif "☒ married" in line_lower:
+            return "Married"
+        elif "☒ single" in line_lower:
+            return "Single"
+        elif "☒ widowed" in line_lower:
+            return "Widowed"
     return None
 
 def extract_fields(text_lines):
@@ -70,11 +82,20 @@ def extract_fields(text_lines):
 
 
     data["passport_num"] = find_value("Passport No/ Unique ID", text_lines)
-    data["ID Type"] = find_value("Passport No/ Unique ID", text_lines)
+    data["passport_issue_date"] = find_value("ID Issue Date", text_lines)
+    data["passport_expiry_date"] = find_value("ID Expiry Date", text_lines)
+
+    data["birth_date"] = find_value("Date of birth ", text_lines)
+
 
     data["country"] = find_value("Country of Domicile", text_lines)
+
+
+    data["phone_num"] = next((line for line in text_lines if re.search(r"\d{2,} \d{3} \d{4}", line)), "")
     data["email"] = next((line for line in text_lines if "@" in line), "")
-    data["phone_number"] = next((line for line in text_lines if re.search(r"\d{2,} \d{3} \d{4}", line)), "")
+
+    data["marital_status"] = extract_maritalState(text_lines)
+
     return data
 
 

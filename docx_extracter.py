@@ -8,16 +8,52 @@ import zipfile
 from lxml import etree
 from plum import add_promotion_rule
 
+from ConsistencyModel import ConsistencyModel
 
-def docx_extracter(profile_value):
+def extract_phone(text_lines):
+    phone_regex = re.compile(r"\+?\d{1,4}[\s\-]?\(?\d{2,4}\)?[\s\-]?\d{2,4}[\s\-]?\d{3,4}")
+    for line in text_lines:
+        if phone_regex.search(line) and "birth" not in line.lower():
+            return phone_regex.search(line).group()
+    return ""
+
+def docx_extracter(cm:ConsistencyModel ,profile_value):
     try:
         docx = base64.b64decode(profile_value, validate=True)
         docx_stream = io.BytesIO(docx)
         text_data = extract_text_from_docx(docx_stream)
 
-        data = {}
-        data = extract_fields(text_data)
-        print(data)
+        extract_fields(cm, text_data)
+
+        print("DOCDSFDSAFADSF")
+
+        fields = [
+            'name', 'surname1', 'surname2',
+            'sex', 'id_type',
+            'passport_num', 'passport_issue_date', 'passport_expiry_date',
+            'passport_ocr', 'birth_date',
+            'country', 'city',
+            'phone_num', 'email',
+            'currency', 'building_num', 'street_name', 'postal_code',
+            'marital_status',
+            'education', 'employment',
+            'wealth', 'bank_account_info',
+            'signature'
+        ]
+
+        for field_name in fields:
+            field = getattr(cm, field_name)
+            print(f"{field_name}: {field.value if hasattr(field, 'value') else field}")
+
+        print("DOCDSFDSAFADSF")
+
+
+
+
+
+
+
+
 
     except binascii.Error as e:
         print(e)
@@ -74,61 +110,45 @@ def extract_employment(label, lines):
     return result[2:]
 
 
-def extract_fields(text_lines):
-    data = {}
-    joined = "\n".join(text_lines)
+def extract_fields(cm:ConsistencyModel, text_lines):
 
     # Line-by-line lookup
     full_name = find_value("First/ Middle Name (s)", text_lines,1)
     name_parts = full_name.split()
-    data["name"] = name_parts[0]
-    data["surname1"] = name_parts[1]
-    data["surname2"] = find_value("Last Name", text_lines,1)
 
-    data["sex"] = extract_gender(text_lines)
-    data["id_type"] = find_value("ID Type", text_lines,1)
-
-
-    data["passport_num"] = find_value("Passport No/ Unique ID", text_lines,1)
-    data["passport_issue_date"] = find_value("ID Issue Date", text_lines,1)
-    data["passport_expiry_date"] = find_value("ID Expiry Date", text_lines,1)
-
-    data["birth_date"] = find_value("Date of birth ", text_lines,1)
-
-
-    data["country"] = find_value("Country of Domicile", text_lines,1)
+    cm.name = name_parts[0]
+    cm.surname1 = name_parts[1]
+    cm.surname2 = find_value("Last Name", text_lines,1)
+    cm.sex = extract_gender(text_lines)
+    cm.id_type = find_value("ID Type", text_lines,1)
+    cm.passport_num = find_value("Passport No/ Unique ID", text_lines,1)
+    cm.passport_issue_date = find_value("ID Issue Date", text_lines,1)
+    cm.passport_expiry_date = find_value("ID Expiry Date", text_lines,1)
+    cm.birth_date = find_value("Date of birth ", text_lines,1)
+    cm.country = find_value("Country of Domicile", text_lines,1)
 
     address = find_value("Address", text_lines,1)
-    data["address"] = address
-
+    cm.address = address
     address = address.split(",")
 
     address[1] = address[1].split()
     address[0] = address[0].split()
-    data["city"] = address[1][-1]
-    data["building number"] = address[0][-1]
-    data["street name"] = " ".join(address[0][:-1])
-    data["postal code"] = address[1][0] + "-" + address[1][1]
 
+    cm.city = address[1][-1]
+    cm.building_number = address[0][-1]
+    cm.street_name = " ".join(address[0][:-1])
+    cm.postal_code = address[1][0] + "-" + address[1][1]
 
+    #cm.phone_num = next((line for line in text_lines if re.search(r"\d{2,} \d{3} \d{4}", line)), "")
+    #phone_pattern = re.compile(r"\+?\d[\d\s\-()]{7,}")
+    #cm.phone_num = next((line.strip() for line in text_lines if phone_pattern.search(line)), "")
+    cm.phone_num = extract_phone(text_lines)
 
+    cm.email = next((line for line in text_lines if "@" in line), "")
+    cm.data = extract_maritalState(text_lines)
+    cm.education = find_value("Education History", text_lines,1)
+    cm.employment = extract_employment("Current employment and function",text_lines)
 
-
-
-
-
-
-    data["phone_num"] = next((line for line in text_lines if re.search(r"\d{2,} \d{3} \d{4}", line)), "")
-    data["email"] = next((line for line in text_lines if "@" in line), "")
-
-    data["marital_status"] = extract_maritalState(text_lines)
-
-    data["education"] = find_value("Education History", text_lines,1)
-
-    #data["employment"] = find_value("Current employment and function", text_lines,1)
-    data["employment"] = extract_employment("Current employment and function",text_lines)
-
-    return data
 
 
 

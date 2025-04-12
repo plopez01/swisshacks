@@ -54,7 +54,6 @@ def read_passport(cm: ConsistencyModel, passport):
     custom_config = r'--oem 1 --psm 6 -c tessedit_char_blacklist=$@&£'
 
     text_aux = pytesseract.image_to_string(bw, config=custom_config)
-    print(text_aux)
     lines = text_aux.splitlines()
     non_empty = []
     for line in lines[:11]:

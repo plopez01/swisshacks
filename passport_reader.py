@@ -8,6 +8,7 @@ from ConsistencyModel import ConsistencyModel
 import re
 import utils
 from utils import birthdate_to_num
+import io, base64
 
 def decode_passport(passport):
     passport = io.BytesIO(base64.b64decode(passport, validate=True))

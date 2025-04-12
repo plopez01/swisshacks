@@ -11,14 +11,13 @@ from utils import birthdate_to_num
 import io, base64
 
 def decode_passport(passport):
-    passport = io.BytesIO(base64.b64decode(passport, validate=True))
     passport = Image.open(passport)
     return passport
 
 def read_passport(cm: ConsistencyModel, passport):
 
     script_dir = os.path.dirname(os.path.abspath(__file__))  # Directory of current script
-    tessdata_path = os.path.join(script_dir, 'tessdata')
+    tessdata_path = os.path.join(script_dir, 'testdata')
 
     # Set the TESSDATA_PREFIX environment variable
     os.environ["TESSDATA_PREFIX"] = tessdata_path

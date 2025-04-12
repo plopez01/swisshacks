@@ -1,7 +1,10 @@
 from PIL import Image, ImageOps
 import pytesseract
-import string
 from ConsistencyModel import ConsistencyModel
+import re
+import utils
+from utils import birthdate_to_num
+
 
 def read_passport(cm: ConsistencyModel, passport):
     # Load image
@@ -35,7 +38,6 @@ def read_passport(cm: ConsistencyModel, passport):
 
     bw.show()
 
-    # OCR
     custom_config = r'--oem 1 --psm 6 -c tessedit_char_blacklist=$@&£'
 
     text_aux = pytesseract.image_to_string(bw, config=custom_config)
@@ -45,16 +47,10 @@ def read_passport(cm: ConsistencyModel, passport):
     for line in lines[:11]:
         if line.strip():  # skip empty or whitespace-only lines
             non_empty.append(line)
-        else:
-            print("hole                          l")
 
     # Take every other line from non-empty (even indices)
     text_list = non_empty[::2]
-
     text_list = text_list + lines[11:]
-
-
-
     passport_info = {}
 
 
@@ -71,8 +67,28 @@ def read_passport(cm: ConsistencyModel, passport):
     passport_info['expiry_date'] = text_list[5].split()[0]
     passport_info['signature'] = signature
 
-
-
-
-    #cm.birth_date.check()
     print(passport_info)
+
+
+    """
+    This is overall just not working might need to use llm
+    
+    text1_list = [s for s in re.sub(r'\s+', ' ', text_list[-2]).strip().split('<') if s]
+    text2_list = [s for s in re.sub(r'\s+', ' ', text_list[-1]).replace(" ", '').split('<') if s]
+    print(text1_list)
+    print(text2_list)
+
+
+    if (text1_list[1] == passport_info['code']+passport_info['surname'] and
+        passport_info['firstname'] == text1_list[2] + " " + text1_list[3]):
+        print("correct1")
+
+    print(passport_info['passport_no']+passport_info['code']+birthdate_to_num(passport_info['birthdate']))
+    print(text2_list[0])
+    if (passport_info['passport_no']+passport_info['code'])+birthdate_to_num(passport_info['birthdate']) == text2_list[0]:
+        print("correct2")
+    # internal passport bottom info check with rest of info
+
+
+    """
+    #cm.birth_date.check()

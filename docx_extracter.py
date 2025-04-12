@@ -6,6 +6,7 @@ from pathlib import Path
 import base64, binascii
 import zipfile
 from lxml import etree
+from plum import add_promotion_rule
 
 
 def docx_extracter(profile_value):
@@ -37,7 +38,7 @@ def extract_text_from_docx(docx_path):
 
     return all_text
 
-def find_value(label, lines, offset=1):
+def find_value(label, lines, offset):
         try:
             idx = lines.index(label)
             return lines[idx + offset].strip()
@@ -66,35 +67,66 @@ def extract_maritalState(text_lines):
             return "Widowed"
     return None
 
+def extract_employment(label, lines):
+    idx = lines.index(label)
+    result = lines[idx+1:idx+5]
+    result = " ".join(result)
+    return result[2:]
+
+
 def extract_fields(text_lines):
     data = {}
     joined = "\n".join(text_lines)
 
     # Line-by-line lookup
-    full_name = find_value("First/ Middle Name (s)", text_lines)
+    full_name = find_value("First/ Middle Name (s)", text_lines,1)
     name_parts = full_name.split()
     data["name"] = name_parts[0]
     data["surname1"] = name_parts[1]
-    data["surname2"] = find_value("Last Name", text_lines)
+    data["surname2"] = find_value("Last Name", text_lines,1)
 
     data["sex"] = extract_gender(text_lines)
-    data["id_type"] = find_value("ID Type", text_lines)
+    data["id_type"] = find_value("ID Type", text_lines,1)
 
 
-    data["passport_num"] = find_value("Passport No/ Unique ID", text_lines)
-    data["passport_issue_date"] = find_value("ID Issue Date", text_lines)
-    data["passport_expiry_date"] = find_value("ID Expiry Date", text_lines)
+    data["passport_num"] = find_value("Passport No/ Unique ID", text_lines,1)
+    data["passport_issue_date"] = find_value("ID Issue Date", text_lines,1)
+    data["passport_expiry_date"] = find_value("ID Expiry Date", text_lines,1)
 
-    data["birth_date"] = find_value("Date of birth ", text_lines)
+    data["birth_date"] = find_value("Date of birth ", text_lines,1)
 
 
-    data["country"] = find_value("Country of Domicile", text_lines)
+    data["country"] = find_value("Country of Domicile", text_lines,1)
+
+    address = find_value("Address", text_lines,1)
+    data["address"] = address
+
+    address = address.split(",")
+
+    address[1] = address[1].split()
+    address[0] = address[0].split()
+    data["city"] = address[1][-1]
+    data["building number"] = address[0][-1]
+    data["street name"] = " ".join(address[0][:-1])
+    data["postal code"] = address[1][0] + "-" + address[1][1]
+
+
+
+
+
+
+
 
 
     data["phone_num"] = next((line for line in text_lines if re.search(r"\d{2,} \d{3} \d{4}", line)), "")
     data["email"] = next((line for line in text_lines if "@" in line), "")
 
     data["marital_status"] = extract_maritalState(text_lines)
+
+    data["education"] = find_value("Education History", text_lines,1)
+
+    #data["employment"] = find_value("Current employment and function", text_lines,1)
+    data["employment"] = extract_employment("Current employment and function",text_lines)
 
     return data
 

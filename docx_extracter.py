@@ -129,7 +129,7 @@ def extract_fields(cm:ConsistencyModel, text_lines):
     address[0] = address[0].split()
 
     cm.city = address[1][-1]
-    cm.building_number = address[0][-1]
+    cm.building_num = address[0][-1]
     cm.street_name = " ".join(address[0][:-1])
     cm.postal_code = address[1][0] + "-" + address[1][1]
 

@@ -1,9 +1,15 @@
+from ConsistencyFields import *
+
 class ConsistencyField:
     def __init__(self, inconsistent_handler):
         self.truth = None
         self._inconsistent_handler = inconsistent_handler
 
     def check(self, val):
+        if self.truth == None:
+            self.truth = val
+            return True
+
         if self._check_impl(val):
             return True
         else:
@@ -11,10 +17,6 @@ class ConsistencyField:
             return False
 
     def _check_impl(self, val):
-        if self.truth == None:
-            self.truth = val
-            return True
-        
         return self.truth == val
 
 class ConsistencyModel:

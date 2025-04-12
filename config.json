@@ -1,4 +1,7 @@
 {
     "player_name": "Fibers",
-    "apikey": "JQvqqf9xxi6vhpIuCt0klxSDofYj7xFwZ5e0EjVgqfQ"
+    "api": {
+        "key": "JQvqqf9xxi6vhpIuCt0klxSDofYj7xFwZ5e0EjVgqfQ",
+        "host": "https://hackathon-api.mlo.sehlat.io"
+    }
 }

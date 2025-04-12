@@ -52,7 +52,7 @@ def read_passport(cm: ConsistencyModel, passport):
     passport_info['passport_no'] = text[1].split()[-1]
     passport_info['surname'] = text[2].split()[0]
     passport_info['firstname'] = text[2].split()[1:]
-    passport_info['fullname'] = passport_info['firstname'] + passport_info['surname']
+    #passport_info['fullname'] = passport_info['firstname'] + passport_info['surname']
     passport_info['birthdate'] = text[3].split()[0]
     passport_info['citizenship'] = ' '.join(text[3].split()[1:])
     passport_info['sex'] = text[4].split()[0][0]  # make sure it is the first letter F or M

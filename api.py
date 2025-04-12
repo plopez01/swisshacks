@@ -1,18 +1,19 @@
 import requests
 import os
 from pathlib import Path
+import json
 
-URL = "https://hackathon-api.mlo.sehlat.io"  # API endpoint
+with open('config.json') as f:
+    config = json.load(f)
 
-def game_starter():
-    api_key = "JQvqqf9xxi6vhpIuCt0klxSDofYj7xFwZ5e0EjVgqfQ"
-    endpoint = f"{URL}/game/start"
+def start_game():
+    endpoint = f"{config['api']['host']}/game/start"
     headers = {
         "Content-Type": "application/json",
-        "x-api-key": f"{api_key}",
+        "x-api-key": f"{config['api']['key']}",
     }
     body = {
-        "player_name": "Fibers",
+        "player_name": config['player_name'],
     }
     
     try:
@@ -26,5 +27,5 @@ def game_starter():
         return None
 
 if __name__ == "__main__":
-    game_starter()
+    print(start_game())
 

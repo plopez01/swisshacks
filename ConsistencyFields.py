@@ -14,11 +14,11 @@ class ConsistencyField:
         if self._check_impl(val):
             return True
         else:
-            self.fail("Inconsistent fields.")
+            self.fail(val, "Inconsistent fields.")
             return False
     
-    def fail(self, reason: str):
-        self._inconsistent_handler(self, reason)
+    def fail(self, value, reason: str):
+        self._inconsistent_handler(self, f"{reason} \"{self.truth}\" differs from \"{value}\"")
 
     def _check_impl(self, val):
         return self.truth == val

@@ -67,6 +67,6 @@ class InconsistencyCounterModel(ConsistencyModel):
         super().__init__(external_handler)
         self.inconsistencies = 0
          
-    def _handler(self, field, reason):
+    def _handler(self, field, value, reason):
         self.inconsistencies += 1
-        self._external_handler(field, reason)
+        self._external_handler(field, value, reason)

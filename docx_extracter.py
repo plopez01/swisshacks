@@ -148,7 +148,7 @@ def extract_fields(cm:ConsistencyModel, text_lines):
     cm.email.check(next((line for line in text_lines if "@" in line), ""))
     cm.marital_status.check(extract_maritalState(text_lines))
     cm.education.check(find_value("Education History", text_lines,1))
-    cm.employment.check(extract_employment("Current employment and function",text_lines))
+    #cm.employment.check(extract_employment("Current employment and function",text_lines))
 
 
 

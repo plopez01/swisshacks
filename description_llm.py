@@ -1,7 +1,46 @@
-from ConsistencyModel import ConsistencyModel
 import google.generativeai as genai
+import requests
+import json
 
-def check_consistency(cm: ConsistencyModel, fields, description_text):
+
+def compare_fields(postulate, val):
+    content = (
+        "You will recieve two inputs, to they mention a similar place or job?\n"
+        "Answer \"consistent\" if yes, \"inconsistent\" if no.\n",
+        f"First input: {postulate}\n"
+        f"Second input: {val}\n"
+    )
+
+    prompt = (
+            content
+    )
+
+    # Configure the generative model API key.
+    question = content
+
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer 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",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "model": "meta-llama/llama-4-maverick:free",
+        "messages": [{"role": "user", "content": question}],
+        "stream": False
+    }
+
+    buffer = ""
+    with requests.post(url, headers=headers, json=payload, stream=False) as r:
+
+        try:
+            return r.content
+            print(data_obj, end="", flush=True)
+        except json.JSONDecodeError:
+            pass
+
+            
+def check_consistency(cm, fields, description_text):
     """
     content = (
             "The year is 13/04/2025\n\n"
@@ -47,8 +86,16 @@ def check_consistency(cm: ConsistencyModel, fields, description_text):
             "- Analyze the text and extract information by filling out the following JSON schema:\n"
             "**Do not return any JSON for older jobs, inferred mismatches, or wording differences. "
             "Do not include any field not included in the JSON list.\n\n"
-            "Text to Analyze:\n"
-            f"{description_text}"
+            "Here is some informations realated how some of the fields usually should look like to facilitate extraction:\n"
+            "- name: may me a name with multiple words\n"
+            "- surname: always one word\n"
+            "- sex: Usually M for Male and F for Female\n"
+            "- id_type: Usually passport\n"
+            "- nationality: The nationality of the person: For example Spanish, Enlgish, Swiss.\n"
+            "- passport_num: Usually a start with letters (2) followed by numbers\n"
+            "- passport_issue_date: All dates include year, month and day in the format \"(year, month, day)\"\n"
+            "- birth_date: All dates include year, month and day in the format \"(year, month, day)\"\n"
+            "If a field can't be filled out because data is not present in the text DO NOT add it to the resulting json.\n"
             "JSON Schema to be filled out:\n"
             "{  \n"
             "  \"name\": \"\",\n"
@@ -58,10 +105,10 @@ def check_consistency(cm: ConsistencyModel, fields, description_text):
             "  \"nationality\": \"\",\n"
             "  \"passport_num\": \"\",\n"
             "  \"passport_code\": \"\",\n"
-            "  \"passport_issue_date\": [\"\", \"\", \"\"],\n"
-            "  \"passport_expiry_date\": [\"\", \"\", \"\"],\n"
+            "  \"passport_issue_date\": \"\",\n"
+            "  \"passport_expiry_date\": \"\",\n"
             "  \"passport_ocr\": \"\",\n"
-            "  \"birth_date\": [\"\", \"\", \"\"],\n"
+            "  \"birth_date\": \"\",\n"
             "  \"country_of_domicile\": \"\",\n"
             "  \"city\": \"\",\n"
             "  \"phone_num\": \"\",\n"
@@ -76,6 +123,7 @@ def check_consistency(cm: ConsistencyModel, fields, description_text):
             "  \"wealth\": \"\",\n"
             "  \"bank_account_info\": \"\"\n"
             "}\n"
+            f"The input:\n{description_text}"
         )
 
     prompt = (
@@ -83,13 +131,28 @@ def check_consistency(cm: ConsistencyModel, fields, description_text):
     )
 
     # Configure the generative model API key.
-    genai.configure(api_key="AIzaSyAwJD4w41itq27V9FvGHyPrHsr477z4tqI")
-    model = genai.GenerativeModel("gemini-1.5-flash-latest")
+    question = content
 
-    # Call the model with the properly constructed single prompt string.
-    response = model.generate_content(prompt)
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+    "Authorization": f"Bearer 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",
+    "Content-Type": "application/json"
+    }
 
-    text = response.text.split("```json")[1].rsplit("```")[0]
-    print(text)
+    payload = {
+    "model": "meta-llama/llama-4-maverick:free",
+    "messages": [{"role": "user", "content": question}],
+    "stream": False
+    }
 
-    return text
+    buffer = ""
+    with requests.post(url, headers=headers, json=payload, stream=False) as r:
+
+        try:
+            return r.content
+            print(data_obj, end="", flush=True)
+        except json.JSONDecodeError:
+            pass
+    
+
+    return None

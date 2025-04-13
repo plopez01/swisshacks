@@ -50,11 +50,11 @@ class ConsistencyModel:
 
         # Education
         # TODO: this should maybe be broken into separate fields
-        self.education = ConsistencyField("education", self)
+        self.education = LLMField("education", self)
 
         # Employment
         # TODO: this should maybe be broken into separate fields
-        self.employment = ConsistencyField("employment", self)
+        self.employment = LLMField("employment", self)
 
         self.wealth = ConsistencyField("wealth", self)
 

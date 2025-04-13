@@ -1,5 +1,6 @@
 from datetime import *
 from unidecode import unidecode
+import description_llm
 
 class ConsistencyField:
     def __init__(self, name, model):
@@ -29,16 +30,14 @@ class ConsistencyField:
             self.discrepancy_source = self.model.document
 
             if type(self.postulate) == str and self._check_impl(unidecode(self.postulate.lower().strip()), unidecode(val.lower().strip())):
-                self.discrepancy_level = 1
-                self.fail("Inconsistent casing/accents.")
+                self.fail(1, "Inconsistent casing/accents.")
             else:
-                self.discrepancy_level = 2
-                self.fail("Inconsistent fields.")
+                self.fail(2, "Inconsistent fields.")
 
             return False
     
-    def fail(self, reason):
-        self.discrepancy_level = 2
+    def fail(self, level, reason):
+        self.discrepancy_level = level
         self.model._handler(self, reason)
 
     def _check_impl(self, postulate, val):
@@ -49,4 +48,14 @@ class ConsistencyField:
 class DateField(ConsistencyField):
     def _check_impl(self, postulate, val: datetime):        
         return postulate == val
-        
+    
+class ContainsField(ConsistencyField):
+    def _check_impl(self, postulate, val):        
+        return postulate in val or val in postulate
+
+class LLMField(ConsistencyField):
+    def _check_impl(self, postulate, val):       
+        result = description_llm.compare_fields(postulate, val)
+        print(result)
+
+        return result == "consistent"        

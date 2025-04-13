@@ -30,14 +30,12 @@ session = gamedata['session_id']
 
 status = "active"
 
-round = 0
-
 while status != "gameover":
     try:
         debug()
         cm = InconsistencyCounterModel(inconsistent_handler)
-        #cm.set_document("passport")
-        #passport_reader.read_passport(cm, gamedata['client_data']['passport'])
+        cm.set_document("passport")
+        passport_reader.read_passport(cm, gamedata['client_data']['passport'])
 
         cm.set_document("account")
         pdf_decoder.decode(cm, gamedata['client_data']['account'])
@@ -49,27 +47,26 @@ while status != "gameover":
         
         description = description_extracter.extract_docx_text_from_base64(gamedata['client_data']['description'])
         
-        if round >= 9:
-            llm_out = description_llm.check_consistency(cm, cm.to_string(), description)
+        llm_out = description_llm.check_consistency(cm, cm.to_string(), description)
 
-            try:
-                llm_parsed = json.loads(llm_out)
-                print(llm_parsed)
-            except json.decoder.JSONDecodeError:
-                print("IA generated JSON is caquita")
-                pass
-
+        try:
+            llm_parsed = json.loads(llm_out)
             print(llm_parsed)
-            for field in vars(cm):
-                data = vars(cm)[field]
-                if isinstance(data, ConsistencyField):
-                    print(data)
-                    print(data.name)
-                    if data.name != 'signature':
-                        try:
-                            if (data.name in llm_parsed and llm_parsed[data.name] != "" and llm_parsed[data.name] != None):
-                                data.check(llm_parsed[data.name])
-                        except: KeyError
+        except json.decoder.JSONDecodeError:
+            print("IA generated JSON is caquita")
+            pass
+
+        print(llm_parsed)
+        for field in vars(cm):
+            data = vars(cm)[field]
+            if isinstance(data, ConsistencyField):
+                print(data)
+                print(data.name)
+                if data.name != 'signature':
+                    try:
+                        if (data.name in llm_parsed and llm_parsed[data.name] != "" and llm_parsed[data.name] != None):
+                            data.check(llm_parsed[data.name])
+                    except: KeyError
                     
         
         print("Accepting" if cm.inconsistencies == 0 else "Rejecting")
@@ -82,8 +79,6 @@ while status != "gameover":
 
         print(f"Status: {status}")
         print(f"Score: {gamedata['score']}")
-
-        round += 1
 
         print()
         time.sleep(2)

@@ -110,36 +110,14 @@ def decode(cm: ConsistencyModel, base64_pdf):
 
     form_values = extract_form_values(pdf_filename)
 
-    if form_values.get("account_name"):
-        full_name = form_values["account_name"].strip()
-        name_parts = full_name.split()
-        
-        form_values["client_name"] = None
-        form_values["surname_1"] = None
-        form_values["surname_2"] = None
-
-        for (i, name_part) in enumerate(name_parts):
-            if i == 0:
-                form_values["client_name"] = name_part
-            elif i == 1:
-                form_values["surname_1"] = name_part
-            elif i == 2:
-                form_values["surname_2"] = name_part
-            else:
-                break
-    
-    if (form_values["surname_1"]):
-        cm.name.check(form_values["client_name"] + " " + form_values["surname_1"])
-    else:
-        cm.name.check(form_values["client_name"])
-
-    cm.surname.check(form_values["surname_2"])
+    cm.name.check(form_values["account_holder_name"])
+    cm.surname.check(form_values["account_holder_surname"])
     cm.passport_num.check(form_values["passport_number"])
     cm.building_num.check(form_values["building_number"])
     cm.street_name.check(form_values["street_name"])
     cm.postal_code.check(form_values["postal_code"])
     cm.city.check(form_values["city"])
-    cm.country.check(form_values["country"])
+    cm.country_of_domicile.check(form_values["country"])
     cm.phone_num.check(form_values["phone_number"])
     cm.email.check(form_values["email"])
 

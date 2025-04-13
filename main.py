@@ -2,6 +2,8 @@ from ConsistencyModel import *
 
 import passport_reader
 import pdf_decoder
+import description_extracter
+
 from description_extracter import extract_docx_text_from_base64
 from docx_extracter import docx_extracter
 
@@ -39,14 +41,20 @@ while status != "gameover":
         cm.set_document("profile")
         docx_extracter(cm, gamedata['client_data']['profile'])
 
+        description_extracter.extract_docx_text_from_base64(gamedata['client_data']['description'])
 
+        print("Accepting" if cm.inconsistencies == 0 else "Rejecting")
         gamedata = api.submit_decision(cm.inconsistencies == 0, session, gamedata['client_id'])
-        
+
         status = gamedata['status']
+
+        if (status == "gameover"):
+            cm.print()
 
         print(f"Status: {status}")
         print(f"Score: {gamedata['score']}")
 
+        print()
         time.sleep(0.5)
     except Exception as e:
         print(e.with_traceback())

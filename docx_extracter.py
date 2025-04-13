@@ -120,20 +120,29 @@ def extract_fields(cm:ConsistencyModel, text_lines):
     cm.passport_issue_date.check(tuple(find_value("ID Issue Date", text_lines,1).split('-')))
     cm.passport_expiry_date.check(tuple(find_value("ID Expiry Date", text_lines,1).split('-')))
     cm.birth_date.check(tuple(find_value("Date of birth ", text_lines,1).split('-')))
-    cm.country.check(find_value("Country of Domicile", text_lines,1))
+    cm.country_of_domicile.check(find_value("Country of Domicile", text_lines,1))
+
 
     address = find_value("Address", text_lines,1)
     #cm.address.check(address)
     address = address.split(",")
 
+    postal_end = 0
+    for i in address[1].strip():
+        if (i.isnumeric() or i == '-' or i == ' '):
+            postal_end += 1
+        else:
+            break
+
+    cm.postal_code.check(address[1][0:postal_end+1].strip())
+    cm.city.check(address[1][postal_end+1:].strip())
     address[1] = address[1].split()
     address[0] = address[0].split()
 
-    cm.city.check(address[1][-1])
     cm.building_num.check(address[0][-1])
     cm.street_name.check(" ".join(address[0][:-1]))
-    cm.postal_code.check(address[1][0] + "-" + address[1][1])
 
+   
 
     cm.phone_num.check(find_value("Telephone", text_lines,1))
     cm.email.check(next((line for line in text_lines if "@" in line), ""))

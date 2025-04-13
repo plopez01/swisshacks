@@ -114,7 +114,7 @@ def read_passport(cm: ConsistencyModel, passport):
     cm.surname.check(passport_info['surname'])
     cm.name.check(passport_info['firstname'])
     cm.birth_date.check(utils.date_to_num_list(passport_info['birthdate']))
-    cm.country.check(mappings.nationality_to_country(passport_info["nationality"]))
+    cm.nationality.check(passport_info["nationality"])
     cm.sex.check(passport_info['sex'])
 
     cm.passport_issue_date.check(utils.date_to_num_list(passport_info['passport_issue_date']))

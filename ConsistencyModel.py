@@ -17,6 +17,9 @@ class ConsistencyModel:
         # This needed?, passport
         self.id_type = ConsistencyField("id_type", self)
 
+        # Danish, Finish, Spanish...
+        self.nationality = ConsistencyField("nationality", self)
+
         self.passport_num = ConsistencyField("passport_num", self)
         self.passport_code = ConsistencyField("passport_code", self)
         
@@ -29,8 +32,8 @@ class ConsistencyModel:
 
         self.birth_date = DateField("birth_date", self)
 
-        # Country is the name, like Portugal, or Spain
-        self.country = ConsistencyField("country", self)
+        # Country Portugal or Spain or Italy
+        self.country_of_domicile = ConsistencyField("country_of_domicile", self)
         self.city = ConsistencyField("city", self)
 
         self.phone_num = ConsistencyField("phone_num", self)
@@ -65,6 +68,12 @@ class ConsistencyModel:
         
     def set_document(self, name: str):
         self.document = name
+    
+    def print(self):
+        for field in vars(self):
+            data = vars(self)[field]
+            if isinstance(data, ConsistencyField):
+                print(f"{data.name}: {data.postulate}")
 
 class InconsistencyCounterModel(ConsistencyModel):
     def __init__(self, external_handler):

@@ -28,7 +28,7 @@ class ConsistencyField:
             self.discrepancy = val
             self.discrepancy_source = self.model.document
 
-            if type(self.postulate) == str and self._check_impl(unidecode(self.postulate.lower()), unidecode(val.lower())):
+            if type(self.postulate) == str and self._check_impl(unidecode(self.postulate.lower().strip()), unidecode(val.lower().strip())):
                 self.discrepancy_level = 1
                 self.fail("Inconsistent casing/accents.")
             else:

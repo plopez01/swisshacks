@@ -39,6 +39,7 @@ def extract_signature(path):
         page = reader.pages[0]
         signature_base64 = None
 
+        """
         if '/Resources' in page and '/XObject' in page['/Resources']:
             xobjects = page['/Resources']['/XObject']
             if '/fzImg0' in xobjects:
@@ -64,8 +65,10 @@ def extract_signature(path):
                 pix.save("signature_region.png")
                 doc.close()
                 return "signature_region.png"
+            
         else:
-            return None
+        """
+        return None
 
 def extract_form_values(path):
     with open(path, 'rb') as file:
@@ -94,19 +97,12 @@ def extract_form_values(path):
                 selected_currency = "other_ccy"
 
         form_data["currency"] = selected_currency if selected_currency else None
-        form_data["signature"] = extract_signature(path)
+        form_data["signature"] = None #Cambiar para producción
 
         return form_data
 
-def decode(cm: ConsistencyModel):
+def decode(cm: ConsistencyModel, base64_pdf):
     directorio_actual = os.getcwd()
-
-    request_result = start_game()
-    if request_result is None:
-        print("Error al obtener el resultado de la solicitud")
-        exit()
-
-    base64_pdf = request_result["client_data"]["account"]
 
     pdf_filename = os.path.join(directorio_actual, "client_account.pdf")
     with open(pdf_filename, "wb") as f:
@@ -132,8 +128,12 @@ def decode(cm: ConsistencyModel):
             else:
                 break
     
-    cm.name.check(form_values["client_name"])
-    cm.surname.check(form_values["surname_1"] + " " + form_values["surname_2"])
+    if (form_values["surname_1"]):
+        cm.name.check(form_values["client_name"] + " " + form_values["surname_1"])
+    else:
+        cm.name.check(form_values["client_name"])
+
+    cm.surname.check(form_values["surname_2"])
     cm.passport_num.check(form_values["passport_number"])
     cm.building_num.check(form_values["building_number"])
     cm.street_name.check(form_values["street_name"])

@@ -30,8 +30,11 @@ while status != "gameover":
     try:
         debug()
         cm = InconsistencyCounterModel(inconsistent_handler)
-        cm.set_document("passport")
-        passport_reader.read_passport(cm, gamedata['client_data']['passport'])
+        #cm.set_document("passport")
+        #passport_reader.read_passport(cm, gamedata['client_data']['passport'])
+
+        cm.set_document("account")
+        pdf_decoder.decode(cm, gamedata['client_data']['account'])
 
         cm.set_document("profile")
         docx_extracter(cm, gamedata['client_data']['profile'])

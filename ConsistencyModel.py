@@ -63,8 +63,6 @@ class ConsistencyModel:
 
         self.signature = ConsistencyField("signature", self)
 
-        self.llm_description = ConsistencyField("llm_description", self)
-
     def _handler(self, field: ConsistencyField, reason):
         self._external_handler(field, reason)
         

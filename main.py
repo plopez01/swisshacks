@@ -10,6 +10,7 @@ from docx_extracter import docx_extracter
 
 import api
 import time
+import json
 from colors import *
 
 def inconsistent_handler(field: ConsistencyField, reason: str):
@@ -42,13 +43,21 @@ while status != "gameover":
         cm.set_document("profile")
         docx_extracter(cm, gamedata['client_data']['profile'])
 
+        cm.set_document("description")
+        
         description = description_extracter.extract_docx_text_from_base64(gamedata['client_data']['description'])
         llm_out = description_llm.check_consistency(cm, cm.to_string(), description)
 
-        if llm_out != "[]":
-            print(llm_out)
-            cm.llm_description.fail("LLM Found inconsistencies")
-            print(f"INCONSITENCIAS ARE {cm.inconsistencies}")
+        llm_parsed = json.loads(llm_out)
+
+        for field in vars(cm):
+            data = vars(cm)[field]
+            if isinstance(data, ConsistencyField):
+                try:
+                    cm[field].check(llm_parsed[field])
+                    print(llm_parsed[field])
+                except: Exception
+                
 
         print("Accepting" if cm.inconsistencies == 0 else "Rejecting")
         gamedata = api.submit_decision(cm.inconsistencies == 0, session, gamedata['client_id'])

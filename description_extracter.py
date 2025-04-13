@@ -12,6 +12,7 @@ def extract_docx_text_from_base64(description_value):
             f.write(description_bytes)
 
         print("✅ File written successfully to description.txt")
+        return str(description_bytes)
 
     except Exception as e:
         print(f"❌ Error: {e}")

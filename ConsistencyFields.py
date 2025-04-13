@@ -38,6 +38,7 @@ class ConsistencyField:
             return False
     
     def fail(self, reason):
+        self.discrepancy_level = 2
         self.model._handler(self, reason)
 
     def _check_impl(self, postulate, val):

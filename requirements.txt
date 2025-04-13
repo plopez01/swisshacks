@@ -4,3 +4,4 @@ pytesseract
 PyMuPDF
 PyPDF2
 unidecode
+google-generativeai

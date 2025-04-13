@@ -63,17 +63,24 @@ class ConsistencyModel:
 
         self.signature = ConsistencyField("signature", self)
 
+        self.llm_description = ConsistencyField("llm_description", self)
+
     def _handler(self, field: ConsistencyField, reason):
         self._external_handler(field, reason)
         
     def set_document(self, name: str):
         self.document = name
     
-    def print(self):
+    def to_string(self):
+        result = ""
         for field in vars(self):
             data = vars(self)[field]
             if isinstance(data, ConsistencyField):
-                print(f"{data.name}: {data.postulate}")
+                result += f"{data.name}: {data.postulate}\n"
+        return result
+
+    def print(self):
+        print(self.to_string(), end='')
 
 class InconsistencyCounterModel(ConsistencyModel):
     def __init__(self, external_handler):

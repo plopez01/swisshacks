@@ -135,7 +135,7 @@ def check_consistency(cm, fields, description_text):
 
     url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
-    "Authorization": f"Bearer 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",
+    "Authorization": f"",
     "Content-Type": "application/json"
     }
 
